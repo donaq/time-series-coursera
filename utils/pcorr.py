@@ -1,4 +1,6 @@
 import numpy as np
+import pandas as pd
+import statsmodels.tsa.stattools as sts
 from scipy import stats, linalg
 
 def pcorr(C):
@@ -36,3 +38,17 @@ def pcorr(C):
             P_corr[j, i] = corr
         
     return P_corr
+
+def acf_df(dat, mode="correlation", nlags=40):
+    """returns acf,aconv,pacf dataframe"""
+    if mode=="covariance":
+        vals = sts.acovf(dat) # nlag arg does not exist in v0.9.0
+    elif mode=="correlation":
+        vals = sts.acf(dat, nlags=nlags)
+    elif mode=="pacf":
+        vals = sts.pacf(dat, nlags=nlags)
+
+    else:
+        raise Exception("wtf")
+
+    return pd.DataFrame(np.array([np.array(range(len(vals))),vals]).T,columns=["lag","values"])
